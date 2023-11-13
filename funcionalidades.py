@@ -55,12 +55,20 @@ def placeShips(board, numShips, pc = False):
 
 def playerTurn(pjBoard, pcBoard):
     print()
-    print(''.center(50,'='))
+    print(''.center(50, '='))
     while True:
         try:
-            row = int(input("Ingrese la fila para su disparo: "))
-            col = int(input("Ingrese la columna para su disparo: "))
-        
+            row = input("Ingrese la fila para su disparo: ")
+            col = input("Ingrese la columna para su disparo: ")
+
+            # Verificar si la coordenada es 'X'
+            if row.upper() == 'X' or col.upper() == 'X':
+                print("Coordenada no válida. No puedes usar 'X'. Inténtelo de nuevo.")
+                continue  # Reiniciar el bucle para solicitar otra vez la entrada
+
+            row = int(row)
+            col = int(col)
+
             print("Se esta verificando si el ataque fue exitoso", end='', flush=True)
 
             for _ in range(3):  # Repetir tres veces para mostrar puntos, luego dos puntos, luego uno.
@@ -68,22 +76,17 @@ def playerTurn(pjBoard, pcBoard):
                 print(".", end='', flush=True)
 
             print()  # Nueva línea después de los puntos
-            
-            if pcBoard[row-1][col-1] == 'B':
+
+            if pcBoard[row - 1][col - 1] == 'B':
                 print("Impacto!")
-                pcBoard[row-1][col-1] = 'D'
-                if game_over(pcBoard):
-                    print("Juego Terminado. El ganador es: PJ")
-                    input("Presione Enter para volver al menú inicial.")
-                    return
+                pcBoard[row - 1][col - 1] = 'D'
             else:
                 print("Disparo Fallado!")
-                pcBoard[row-1][col-1] = 'X'
+                pcBoard[row - 1][col - 1] = 'X'
             break
         except (ValueError, IndexError):
             print("Entrada inválida. Inténtelo de nuevo.")
-      
-    return [pcBoard,pjBoard]
+
 
 def computerTurn(pjBoard, pcBoard):
     print("La máquina está eligiendo donde disparar ", end='', flush=True)
@@ -103,18 +106,12 @@ def computerTurn(pjBoard, pcBoard):
         if pjBoard[row][col] == 'B':
             print("Impacto Enemigo")
             pjBoard[row][col] = 'D'
-            if game_over(pjBoard):
-                print("Juego Terminado. El ganador es: PC")
-                input("Presione Enter para volver al menú inicial.")
-                return
         elif pjBoard[row][col] == 'O':
             print("Disparo Enemigo Fallado")
             pjBoard[row-1][col-1] = 'X'
             break
     
     print(''.center(50,'='))
-
-    return [pjBoard,pcBoard]
 
 def game_over(board):
     for row in board:
@@ -141,7 +138,7 @@ def playGame(player_name):
     time.sleep(1.5)
     while True:
         showBoard(pjBoard, pcBoard,player_name) if player_name != '' else showBoard(pjBoard, pcBoard)
-        pcBoard, pjBoard = playerTurn(pjBoard, pcBoard)
+        playerTurn(pjBoard, pcBoard)
         if game_over(pcBoard):
             os.system('cls')
             print("Juego Terminado.") 
@@ -150,7 +147,7 @@ def playGame(player_name):
             break
         print(''.center(50,'='))
         #showBoard(pjBoard, pcBoard,player_name) if player_name != '' else showBoard(pjBoard, pcBoard,player_name)
-        pjBoard,pcBoard = computerTurn(pjBoard, pcBoard)
+        computerTurn(pjBoard, pcBoard)
         time.sleep(3)
         print()
         if game_over(pjBoard):
@@ -159,7 +156,6 @@ def playGame(player_name):
             print("El ganador es: PC")
             input("Presione Enter para volver al menú inicial.")
             break
-
 # Función principal
 def main():
     player_name = ''
